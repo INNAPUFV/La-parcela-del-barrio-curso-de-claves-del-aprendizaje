@@ -1,0 +1,566 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La parcela del barrio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Crimson+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: una tarjeta central con tres fases (escena inicial, cinco pruebas con calendario de la temporada, resultado con perfil). Colores y tipografía de la plantilla UFV (Playfair Display y Crimson Text). Sin recursos externos, para poder insertarla en Canvas. */
+:root{
+  --font-display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --font-body:"Crimson Text",Georgia,"Times New Roman",serif;
+  --bg:#FFFFFF;
+  --surface:#FFFFFF;
+  --surface-2:#F1F6FF;
+  --ink:#001A33;
+  --ink-soft:#44586C;
+  --line:#CACACA;
+  --brand:#003865;
+  --brand-2:#649EFF;
+  --on-brand:#FFFFFF;
+  --accent:#FF5D74;
+  --accent-2:#C03656;
+  --p1:#003865;--p1-bg:#E4ECF4;
+  --p2:#649EFF;--p2-bg:#E8F0FF;
+  --p3:#FF5D74;--p3-bg:#FFE9EC;
+  --board:#003865;--chalk:#FFFFFF;--chalk-soft:#CACACA;
+  --shadow:0 1px 2px rgba(0,26,51,.06),0 18px 40px -18px rgba(0,26,51,.28);
+  color-scheme:light;
+}
+.p1{--pc:var(--p1);--pc-bg:var(--p1-bg);--on-pc:#FFFFFF}
+.p2{--pc:var(--p2);--pc-bg:var(--p2-bg);--on-pc:#001A33}
+.p3{--pc:var(--p3);--pc-bg:var(--p3-bg);--on-pc:#001A33}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:18px;
+  line-height:1.55;
+  padding:24px 16px 48px;
+}
+.shell{max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+button{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--brand-2);outline-offset:3px;border-radius:10px}
+
+/* Cabecera */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.top > div{min-width:0}
+.eyebrow{margin:0 0 6px;font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+h1{margin:0;font-family:var(--font-display);font-weight:700;font-size:clamp(1.7rem,1.2rem + 2.4vw,2.4rem);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
+.kicker{margin:8px 0 0;font-family:var(--font-display);font-weight:700;font-size:1.05rem}
+.sub{margin:6px 0 0;color:var(--ink-soft);max-width:56ch}
+.bubble{flex:none;width:88px;height:88px}
+.bubble .b1{fill:var(--brand-2);fill-opacity:.9}
+.bubble .b2{fill:var(--accent);fill-opacity:.95}
+.bubble .b3{fill:var(--ink-soft);fill-opacity:.35}
+
+/* Tarjeta */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:clamp(18px,3.2vw,30px)}
+.fade{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.stage.in-right{animation:inRight .45s cubic-bezier(.2,.8,.2,1) both}
+.stage.in-left{animation:inLeft .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes inRight{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes inLeft{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+
+/* Escena inicial */
+.scene h2{margin:0 0 10px;font-family:var(--font-display);font-weight:700;font-size:clamp(1.3rem,1.05rem + 1.2vw,1.7rem);line-height:1.15;text-wrap:balance}
+.scene p{margin:0 0 14px;max-width:62ch}
+.quote{margin:18px 0;padding:18px 20px;border-radius:16px;background:var(--board);color:var(--chalk);font-family:var(--font-display);font-weight:700;font-size:clamp(1.15rem,1rem + .9vw,1.45rem);line-height:1.3}
+.quote small{display:block;margin-top:6px;font-family:var(--font-body);font-weight:400;font-size:.85rem;color:var(--chalk-soft)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 22px;padding:0;list-style:none}
+.rules li{padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);font-size:.92rem;line-height:1.4}
+.rules b{display:block;font-family:var(--font-display);font-size:1.02rem}
+
+/* Reloj de la jornada */
+.clock{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0;padding:0;list-style:none}
+.clock button{width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink-soft);cursor:pointer;transition:border-color .2s,background .2s,transform .18s}
+.clock button:disabled{opacity:.5;cursor:not-allowed}
+.clock button:hover:not(:disabled){transform:translateY(-2px);border-color:var(--brand-2)}
+.clock .t{font-family:var(--font-display);font-weight:700;font-size:.92rem;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums;text-align:center}
+.clock .n{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.clock .done{border-color:color-mix(in srgb,var(--brand) 55%,transparent);background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.clock .current{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 14%,var(--surface));box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+.clock .current .n,.clock .done .n{color:var(--brand)}
+
+/* Contexto y continuidad */
+.ctx{margin:0 0 20px;padding:14px 16px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);font-size:.94rem;color:var(--ink-soft);max-width:none}
+.ctx strong{color:var(--ink)}
+.lead{margin:0 0 8px;max-width:62ch;color:var(--ink-soft);font-size:.97rem}
+.lead .j{font-weight:700;color:var(--brand)}
+/* Prueba */
+.stage{margin-top:24px}
+.tag{display:inline-block;padding:4px 11px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand)}
+.stage h2{margin:12px 0 8px;font-family:var(--font-display);font-weight:700;font-size:clamp(1.3rem,1.05rem + 1.2vw,1.7rem);line-height:1.15;letter-spacing:-.01em;text-wrap:balance;outline:none}
+.sit{margin:0 0 6px;max-width:62ch}
+.ask{margin:14px 0 14px;font-family:var(--font-display);font-weight:700;font-size:1.15rem}
+.options{display:grid;gap:11px}
+.option{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;padding:14px 16px;border:1.5px solid var(--line);border-radius:15px;background:var(--surface);color:var(--ink);line-height:1.4;cursor:pointer;transition:transform .18s,border-color .18s,background .18s,box-shadow .18s}
+.option .oh{font-family:var(--font-display);font-weight:700;font-size:1.03rem}
+.option .ot{font-size:.96rem;color:var(--ink-soft)}
+.option:hover{transform:translateY(-2px);border-color:var(--brand-2);background:var(--surface-2)}
+.option[aria-pressed="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface));box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
+.option[aria-pressed="true"] .ot{color:var(--ink)}
+.board-opt .oh{font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.board-opt .ot{font-family:var(--font-display);font-weight:700;font-size:1.08rem;color:var(--ink)}
+.react{margin-top:16px;padding:15px 16px;border-radius:15px;background:var(--surface-2);border:1px solid var(--line)}
+.react.anim{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+.react .rl{margin:0 0 3px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-2)}
+.react p{margin:0}
+.pick-hint{margin:14px 2px 0;font-size:.9rem;color:var(--ink-soft)}
+
+/* Navegación */
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px dashed var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,border-color .18s}
+.btn:hover:not(:disabled){transform:translateY(-2px);border-color:var(--brand-2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand);box-shadow:0 10px 22px -12px var(--brand)}
+.btn.primary:hover:not(:disabled){background:var(--ink);border-color:var(--ink)}
+.btn svg{width:18px;height:18px}
+
+/* Resultado */
+.bridge-lead{margin:12px 0 0}
+.h-lead{margin:0 0 14px;color:var(--ink-soft);font-size:.95rem}
+.br{display:block;margin-top:6px;font-size:.86rem;line-height:1.4;color:var(--ink-soft)}
+.br em{display:block;font-style:normal;font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-2)}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.field label{font-weight:700;font-size:.97rem}
+.field input[type=text],.field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);font:inherit;line-height:1.45;transition:border-color .2s,box-shadow .2s}
+.field textarea{resize:vertical;min-height:84px}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-2) 22%,transparent)}
+.field ::placeholder{color:var(--ink-soft);opacity:.75}
+.pledge{margin:0 0 6px;padding:16px 18px;border-radius:15px;background:var(--surface-2);border:1px dashed var(--brand-2);font-family:var(--font-display);font-weight:700;font-size:1.05rem;line-height:1.4;overflow-wrap:anywhere}
+.pledge.empty{color:var(--ink-soft);font-weight:400}
+h2.sec{margin:0 0 6px;font-family:var(--font-display);font-weight:700;font-size:clamp(1.4rem,1.1rem + 1.4vw,1.9rem);line-height:1.15;text-wrap:balance;outline:none}
+.res-intro{margin:0 0 6px;color:var(--ink-soft)}
+.pcard{display:flex;gap:16px;padding:18px;border-radius:18px;background:var(--pc-bg);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent);margin-top:14px}
+.pbig{flex:none;width:60px;height:60px;border-radius:50%;background:var(--pc);color:var(--on-pc);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:1.8rem}
+.pcard > div{min-width:0}
+.pcard h3{margin:0 0 2px;font-family:var(--font-display);font-size:1.25rem;font-weight:700;line-height:1.2}
+.pcard .resp{margin:0 0 8px;font-size:.92rem;color:var(--ink-soft)}
+.pcard .resp strong{color:var(--ink)}
+.pcard p{margin:0 0 8px}
+.pcard p:last-child{margin-bottom:0}
+h3.h{margin:28px 0 12px;font-family:var(--font-display);font-size:1.08rem;font-weight:700}
+.chalkboard{margin-top:22px;padding:18px 20px;border-radius:16px;background:var(--board);color:var(--chalk)}
+.chalkboard .cl{margin:0 0 6px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-soft)}
+.chalkboard p.ct{margin:0;font-family:var(--font-display);font-weight:700;font-size:1.2rem;line-height:1.35}
+.path{display:grid;gap:9px;margin:0;padding:0;list-style:none}
+.path li{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface)}
+.path .pt{flex:none;min-width:4.4rem;font-family:var(--font-display);font-weight:700;font-size:.9rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.path .pb{flex:1;min-width:0;font-size:.95rem}
+.path .pb b{display:block}
+.pill{flex:none;width:26px;height:26px;border-radius:50%;background:var(--pc);color:var(--on-pc);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:.85rem}
+.cats{display:grid;gap:14px}
+.cat-row{display:grid;gap:6px}
+.cat-row .lbl{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;font-weight:700}
+.cat-row .lbl span:last-child{font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.meter{height:9px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:99px;background:var(--pc);transition:width 1s cubic-bezier(.2,.8,.2,1) .3s}
+.rev-list{display:grid;gap:9px}
+details.rev{border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+details.rev summary{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;list-style:none;font-weight:700;font-size:.96rem}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev summary .t{flex:1;min-width:0}
+details.rev summary .chev{flex:none;width:18px;height:18px;color:var(--ink-soft);transition:transform .2s}
+details.rev[open] summary .chev{transform:rotate(180deg)}
+.rev-body{padding:0 14px 14px 52px;font-size:.94rem}
+.rev-body p{margin:0 0 7px}
+.rev-body .soft{color:var(--ink-soft)}
+.closing{margin:28px 0 0;padding:20px 22px;border-radius:16px;background:color-mix(in srgb,var(--brand) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--brand) 40%,transparent);font-family:var(--font-display);font-weight:700;font-size:1.05rem;line-height:1.45}
+.next-note{margin:14px 0 0;color:var(--ink-soft)}
+.res-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.toast{font-size:.9rem;color:var(--brand);font-weight:700}
+.copybox{margin-top:14px}
+.copybox label{display:block;margin-bottom:6px;font-weight:700;font-size:.95rem}
+.copybox textarea{width:100%;min-height:150px;padding:12px 14px;border:1.5px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem;line-height:1.45}
+
+@media (max-width:560px){
+  .rules{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .bubble{width:64px;height:64px}
+  .clock{gap:4px}
+  .clock .t{font-size:.78rem}
+  .clock .n{font-size:.6rem;letter-spacing:.04em}
+  .nav .btn{flex:1}
+  .rev-body{padding-left:14px}
+  .pcard{flex-direction:column;gap:10px}
+  .res-actions .btn{flex:1}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<main class="shell">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bloque II. ¿Para qué se aprende?</p>
+      <h1>La parcela del barrio</h1>
+      <p class="kicker">Actividad de apertura · Reto</p>
+      <p class="sub">Una temporada, una parcela y cinco decisiones. No hay respuestas correctas. Cómo resuelves aprender algo nuevo dice mucho sobre para qué aprendes.</p>
+    </div>
+    <svg class="bubble" viewBox="0 0 96 96" role="img" aria-label="Un brote con dos hojas saliendo de la tierra">
+      <ellipse class="b3" cx="48" cy="86" rx="30" ry="6"/>
+      <rect class="b1" x="46" y="42" width="4" height="44" rx="2"/>
+      <path class="b1" d="M46 56C30 58 17 48 15 30c17-2 29 6 31 26z"/>
+      <path class="b2" d="M50 46C54 27 68 15 85 15c0 19-12 32-35 31z"/>
+    </svg>
+  </header>
+
+  <section class="card" id="card" aria-label="Reto"></section>
+  <section class="card fade" id="results" hidden aria-live="polite"></section>
+</main>
+
+<script>
+/* SCORM 1.2 opcional. Si no hay LMS con API, no hace nada y la página funciona igual. */
+(function(){
+  var api=null;
+  function find(w){ var n=0; while(w && !w.API && w.parent && w.parent!==w && n<10){ w=w.parent; n++; } return (w && w.API) ? w.API : null; }
+  try{ api = find(window) || (window.opener ? find(window.opener) : null); }catch(e){}
+  window.__scorm = {
+    init:function(){ try{ if(api){ api.LMSInitialize(""); api.LMSSetValue("cmi.core.lesson_status","incomplete"); api.LMSCommit(""); } }catch(e){} },
+    done:function(){ try{ if(api){ api.LMSSetValue("cmi.core.lesson_status","completed"); api.LMSCommit(""); } }catch(e){} }
+  };
+  window.addEventListener("pagehide",function(){ try{ if(api) api.LMSFinish(""); }catch(e){} });
+  window.__scorm.init();
+})();
+</script>
+<script>
+(function(){
+  var KEY = "bloque2-parcela-del-barrio";
+
+  /* Perfiles: textos copiados del documento «Bloque II — Actividad de apertura». */
+  var P = {
+    1: { n:"Perfil 1", name:"El docente que aprende desde su curiosidad",
+         r:"motivaciones personales, crecimiento individual",
+         t:["Tiendes a aprender cuando sientes una necesidad propia: curiosidad, insatisfacción con tus resultados o deseo de mejorar. Tu aprendizaje es genuino y está impulsado desde adentro.",
+            "El reto para ti es preguntarte: ¿ese aprendizaje llega hasta tus estudiantes, o se queda contigo?"] },
+    2: { n:"Perfil 2", name:"El docente que aprende a través de los demás",
+         r:"adaptación al grupo, respuesta a las necesidades de los estudiantes",
+         t:["Eres muy sensible a lo que pasa en tu aula y en tu comunidad educativa. Aprendes cuando ves que algo no está funcionando para tus estudiantes.",
+            "Tu fortaleza es la adaptación; tu pregunta pendiente es: ¿estás respondiendo solo a lo inmediato, o también estás formando para el futuro?"] },
+    3: { n:"Perfil 3", name:"El docente que aprende pensando en el futuro",
+         r:"impacto a largo plazo, sentido de responsabilidad",
+         t:["Piensas en el aprendizaje como algo que va más allá del aula. Te preguntas qué tipo de personas estás formando y qué huella dejas. Tienes una visión amplia de tu rol docente.",
+            "Tu desafío es no perder de vista lo cotidiano mientras piensas en lo grande."] }
+  };
+  var INTRO = "Según tus respuestas predominantes, puedes identificarte con uno de estos tres perfiles. Recuerda que ninguno es mejor que otro.";
+  var CLOSING = "Ningún perfil es mejor que otro. Todos los docentes combinamos estas formas de aprender en distintos momentos. Lo importante es reconocer desde dónde partimos, porque eso también determina cómo enseñamos.";
+
+  /* Cinco pruebas, de marzo a octubre, encadenadas. En cada una, o[1], o[2] y o[3] son tres formas igual de razonables
+     de resolverla, asociadas al perfil 1, 2 y 3. ord fija el orden en pantalla para que la posición no delate el perfil.
+     jump marca el salto de tiempo y cont continúa la historia según lo que se eligió en la prueba anterior.
+     br es la misma pregunta para todos: lo que esa prueba representa en la práctica docente. */
+  var ST = [
+    { time:"Marzo", when:"En la parcela", title:"Primera siembra", ord:[2,1,3],
+      jump:"Un sábado de marzo.",
+      br:"Al preparar un tema nuevo, ¿de dónde partes?",
+      sit:"Tienes la llave, seis metros de tierra y un sobre de semillas vacío. En la parcela de al lado, Rosa, que lleva veinte años cultivando, te saluda con la mano y te deja a tu aire. Todavía no sabes qué plantar, y tampoco del todo por qué has empezado esto.",
+      ask:"¿Qué haces primero?",
+      o:{
+        1:{h:"Plantas lo que siempre quisiste probar", t:"Tomates raros, aromáticas, esa calabaza de la que leíste una vez. Empiezas por lo que te llama a ti.",
+           r:"A las diez de la mañana la tierra ya está llena de cosas que te hacen ilusión. La parcela es muy tuya. Queda por ver qué opina Rosa de tus calabazas."},
+        2:{h:"Averiguas qué hace falta por aquí", t:"Preguntas qué se da bien en este suelo y qué se come en tu casa y en el barrio. Siembras lo que tiene sentido ahora.",
+           r:"Después de dos conversaciones y un paseo por las otras parcelas, tu lista de siembra le parece bien a todo el mundo. Para este año, al menos."},
+        3:{h:"Piensas en lo que quieres dejar", t:"Empiezas por la tierra y no por la cosecha, con compost, un frutal y algo que siga ahí dentro de cinco años.",
+           r:"Pasas la mañana con compost y un frutal pequeño. Es una buena base. En abril, Rosa ya tendrá lechugas."}
+      } },
+    { time:"Abril", when:"Primeros brotes", title:"Cómo aprendes", ord:[3,2,1],
+      jump:"Han pasado tres semanas.",
+      cont:{1:"Las calabazas raras y las aromáticas ya asoman entre la tierra.",
+            2:"Las lechugas y las judías que te recomendaron ya asoman entre la tierra.",
+            3:"El compost huele a tierra buena y el frutal pequeño aguanta."},
+      br:"Para formarte como docente, ¿cómo prefieres hacerlo?",
+      sit:"Con los primeros brotes llega la duda. No sabes casi nada de cómo cuidarlos. Rosa te ve mover la regadera y sonríe. Ella también empezó así.",
+      ask:"¿Cómo vas a aprender a cuidarlos?",
+      o:{
+        1:{h:"Lo vas descubriendo a tu ritmo", t:"Libros, vídeos y muchas pruebas con tus propias manos. Te gusta descubrir cómo funciona el suelo a tu ritmo.",
+           r:"Dos semanas, tres libros y una libreta llena de subrayados. Entiendes por qué la tierra hace lo que hace. Por ahora, todo ese saber vive en tu cuaderno."},
+        2:{h:"Aprendes junto a Rosa", t:"Observas lo que hace, le preguntas y vas ajustando lo tuyo a lo que ves funcionar en la parcela de al lado.",
+           r:"Aprendes mirando por encima del seto: cuándo regar, qué podar, qué no tocar. Todo te sirve para esta semana. De algunas cosas todavía no sabes el porqué."},
+        3:{h:"Montas un método que dure", t:"Te apuntas al curso de la asociación y empiezas un diario de la parcela, para que lo aprendido le sirva a quien venga después.",
+           r:"El curso te da una base sólida y el diario ya tiene su propio índice. Mientras tanto, la parcela sigue esperando a que alguien meta las manos."}
+      } },
+    { time:"Junio", when:"Ola de calor", title:"Se seca la mitad", ord:[1,3,2],
+      jump:"Es junio y lleva una semana sin llover.",
+      cont:{1:"Tienes la libreta llena de apuntes y varias ideas por probar.",
+            2:"Has aprendido de Rosa a podar, a regar y a no tocar.",
+            3:"Tu diario ya tiene tres capítulos y el curso casi ha terminado."},
+      br:"Cuando algo no sale como esperabas en tu práctica, ¿qué haces primero?",
+      sit:"Un martes de calor vuelves a la parcela y la mitad de las plantas está seca. Rosa y otros vecinos se acercan a mirar, con cara de preocupación y sin saber muy bien qué decirte.",
+      ask:"¿Cuál es tu primera reacción?",
+      o:{
+        1:{h:"Revisas tu manera de regar", t:"Repasas qué hiciste y cuándo lo hiciste. Seguro que hay algo que tú puedes hacer mejor la próxima vez.",
+           r:"Descubres que regabas a mediodía, con el sol en lo alto. Ese error ya no se repite. Los trucos que los vecinos llevan años usando con el calor siguen por descubrir."},
+        2:{h:"Buscas otra solución para esas plantas", t:"Pones sombra, cambias de variedad, riegas de noche. Adaptas lo que tienes a lo que está pasando.",
+           r:"Con una malla de sombra y otra variedad, salvas la mitad de lo que quedaba. La próxima sorpresa pedirá otra solución distinta."},
+        3:{h:"Asumes la responsabilidad y pides ayuda", t:"Sientes que te toca a ti. Hablas con Rosa y con quien lleva años cultivando para entender qué ha pasado de verdad.",
+           r:"Rosa te cuenta que a todos les pasó el primer año, y eso te tranquiliza. Aun así, sigues dándole vueltas a lo que pudiste hacer distinto."}
+      } },
+    { time:"Agosto", when:"Primera cosecha", title:"Una cesta de tomates", ord:[2,3,1],
+      jump:"Es agosto.",
+      cont:{1:"Has cambiado la hora del riego y apuntado en la libreta por qué.",
+            2:"La malla de sombra y la otra variedad han hecho su trabajo.",
+            3:"Rosa te ha enseñado a regar al amanecer y te pregunta por las plantas cada vez que pasa."},
+      br:"Con lo que aprendes, ¿qué haces después?",
+      sit:"Y entonces llega algo que no esperabas: hay cosecha. Vuelves a casa con una cesta llena, con más de lo que puedes comer. Rosa te ve pasar con ella y levanta los pulgares.",
+      ask:"¿Qué haces con la cesta?",
+      o:{
+        1:{h:"Pruebas esa receta que tenías pendiente", t:"Aprovechas los tomates para cocinar algo que llevas tiempo queriendo probar, y anotas cómo sale para repetirlo.",
+           r:"La receta sale a la segunda, y los tomates saben a tomate. Queda todo apuntado en tu cuaderno. Los vecinos se enteran de la cosecha por casualidad."},
+        2:{h:"Los llevas a quien los necesita", t:"Una bolsa para Rosa, otra para tu familia, otra para la cena del barrio. Los usas para lo que hace falta ahora.",
+           r:"Las bolsas desaparecen en dos días y te lo agradecen en el portal. Para el invierno, nadie ha dicho todavía qué se va a plantar."},
+        3:{h:"Guardas semillas y las compartes", t:"Separas las mejores para el año que viene y se las das a quien quiera empezar su propia parcela.",
+           r:"Dos vecinos quieren probar con tus semillas. Esa noche cenas sin tomates, pero con la sensación de que algo sigue."}
+      } },
+    { time:"Octubre", when:"Cierre de temporada", title:"El cartel de la parcela", ord:[3,1,2], board:true,
+      jump:"Es octubre y la temporada se cierra.",
+      cont:{1:"En tu cuaderno hay ya una página entera de recetas con tomate.",
+            2:"Todavía hay vecinos que te saludan por los tomates.",
+            3:"Dos parcelas del huerto tienen ya semillas tuyas."},
+      br:"Al final, ¿para qué enseñas lo que enseñas?",
+      sit:"La asociación reparte los carteles de madera de los que hablaba la nota del tablón. Cada vecino escribe uno para su parcela. Solo cabe una frase.",
+      ask:"¿Cómo completas «Aprender a cultivar me sirvió para…»?",
+      o:{
+        1:{h:"Para seguir con ganas", t:"…tener un rincón donde aprender por puro gusto.",
+           r:"Quien pasa sonríe al leerlo, se nota que lo disfrutas. Rosa se pregunta, en voz baja, si en ese rincón habría sitio también para ella."},
+        2:{h:"Para lo que tengo cerca", t:"…alimentar mejor a mi familia y echar una mano en el barrio.",
+           r:"Varios asienten, es justo lo que necesitaban leer. Rosa pregunta qué pasará con la parcela el año que viene."},
+        3:{h:"Para lo que viene después", t:"…dejar algo vivo a quienes vengan después de mí.",
+           r:"Rosa se queda un buen rato leyéndolo. Otro vecino quiere saber cuándo es la próxima siembra."}
+      } }
+  ];
+  var N = ST.length;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var card = $("card"), results = $("results");
+  var S = { phase:"intro", step:0, reached:0, ans:[null,null,null,null,null], t1:"", t2:"" };
+
+  try{
+    var sv = JSON.parse(localStorage.getItem(KEY) || "null");
+    if(sv && Array.isArray(sv.ans) && sv.ans.length===N){
+      S.ans = sv.ans.map(function(a){ return (a===1||a===2||a===3) ? a : null; });
+      S.phase = sv.phase==="play"||sv.phase==="result" ? sv.phase : "intro";
+      S.step = Math.min(Math.max(+sv.step||0,0),N-1);
+      S.reached = Math.min(Math.max(+sv.reached||0,0),N-1);
+      S.t1 = typeof sv.t1==="string" ? sv.t1 : ""; S.t2 = typeof sv.t2==="string" ? sv.t2 : "";
+    }
+  }catch(e){}
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function boardText(p){ return "Aprender a cultivar me sirvió para "+ST[N-1].o[p].t.replace(/^…/,""); }
+  function allDone(){ return S.ans.every(function(a){ return a!==null; }); }
+  if(S.phase==="result" && !allDone()) S.phase = "play";
+
+  var ICON_PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+  var ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  var ICON_CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+  /* ---------- Escena inicial ---------- */
+  function renderIntro(){
+    results.hidden = true; card.hidden = false;
+    card.innerHTML =
+      '<div class="scene fade">'+
+        '<p class="ctx"><strong>Antes de empezar.</strong> Esta actividad abre el Bloque II, que trata de para qué se aprende. Para arrancar no vas a hablar de lo que enseñas. Vas a aprender algo desde cero, lejos del trabajo, y a fijarte en cómo lo haces. Al final lo traeremos de vuelta a tu docencia.</p>'+
+        '<h2 tabindex="-1" id="focus-h">Un papel en el tablón</h2>'+
+        '<p>Vives en un barrio con un huerto comunitario y nunca has cultivado nada. Un día, en el tablón de anuncios de la asociación de vecinos, ves una nota:</p>'+
+        '<div class="quote">«Parcela libre en el huerto del barrio hasta octubre. Se busca a alguien con ganas. Al cerrar la temporada, cada vecino pone en su parcela un cartel con una frase.»<small>Está al final de tu calle.</small></div>'+
+        '<p>En la parcela de al lado trabaja Rosa, que lleva veinte años cultivando, saluda a todo el mundo y ayuda a quien se lo pide.</p>'+
+        '<p><strong>Tu reto</strong> es llegar a octubre con una parcela y un cartel que puedas firmar. Vas a tener que aprender casi todo por el camino, y te esperan cinco decisiones.</p>'+
+        '<ul class="rules">'+
+          '<li><b>5 pruebas</b>Una por momento de la temporada, de marzo a octubre.</li>'+
+          '<li><b>Unos 4 minutos</b>Sin cronómetro. Las decisiones no se piensan demasiado.</li>'+
+          '<li><b>Sin nota</b>Elige lo que harías de verdad, no lo que quedaría mejor.</li>'+
+        '</ul>'+
+        '<button class="btn primary" type="button" id="start">Aceptar el reto '+ICON_NEXT+'</button>'+
+      '</div>';
+    $("start").addEventListener("click", function(){ S.phase="play"; S.step=0; save(); renderPlay(1); window.scrollTo({top:0,behavior:"smooth"}); });
+  }
+
+  /* ---------- Pruebas ---------- */
+  function renderPlay(dir){
+    results.hidden = true; card.hidden = false;
+    var st = ST[S.step], cur = S.ans[S.step];
+    var h = '<ol class="clock" aria-label="Momentos de la temporada">';
+    ST.forEach(function(x,i){
+      var cls = i===S.step ? "current" : (S.ans[i]!==null ? "done" : "");
+      h += '<li><button type="button" class="'+cls+'" data-i="'+i+'"'+(i>S.reached?' disabled':'')+(i===S.step?' aria-current="step"':'')+'><span class="t">'+esc(x.time)+'</span><span class="n">Prueba '+(i+1)+'</span></button></li>';
+    });
+    h += '</ol>';
+    h += '<div class="stage '+(dir>0?'in-right':'in-left')+'">'+
+      '<span class="tag">'+esc(st.when)+' · Prueba '+(S.step+1)+' de '+N+'</span>'+
+      '<h2 tabindex="-1" id="focus-h">'+esc(st.title)+'</h2>'+
+      leadHTML()+'<p class="sit">'+esc(st.sit)+'</p>'+
+      '<p class="ask" id="ask">'+esc(st.ask)+'</p>'+
+      '<div class="options" role="group" aria-labelledby="ask">';
+    st.ord.forEach(function(p){
+      var o = st.o[p];
+      h += '<button type="button" class="option'+(st.board?' board-opt':'')+'" data-p="'+p+'" aria-pressed="'+(cur===p)+'">'+
+        '<span class="oh">'+esc(o.h)+'</span><span class="ot">'+esc(o.t)+'</span></button>';
+    });
+    h += '</div>';
+    h += '<div id="react">'+(cur?reactHTML(st,cur,false):'<p class="pick-hint">Elige una opción para continuar.</p>')+'</div>';
+    h += '</div>';
+    h += '<div class="nav"><button class="btn" type="button" id="prev"'+(S.step===0?' disabled':'')+'>'+ICON_PREV+' Anterior</button>'+
+         '<button class="btn primary" type="button" id="next"'+(cur?'':' disabled')+'>'+(S.step===N-1?'Ver cómo lo resolví':'Siguiente prueba '+ICON_NEXT)+'</button></div>';
+    card.innerHTML = h;
+
+    Array.prototype.forEach.call(card.querySelectorAll(".clock button"), function(b){
+      b.addEventListener("click", function(){ var i=+b.getAttribute("data-i"); if(i!==S.step) goStep(i); });
+    });
+    Array.prototype.forEach.call(card.querySelectorAll(".option"), function(b){
+      b.addEventListener("click", function(){ choose(+b.getAttribute("data-p")); });
+    });
+    $("prev").addEventListener("click", function(){ if(S.step>0) goStep(S.step-1); });
+    $("next").addEventListener("click", function(){
+      if(S.ans[S.step]===null) return;
+      if(S.step<N-1){ S.reached = Math.max(S.reached, S.step+1); goStep(S.step+1); }
+      else { S.phase="result"; save(); renderResult(); }
+    });
+    if(dir){ var f = $("focus-h"); if(f) f.focus({preventScroll:true}); }
+  }
+  function leadHTML(){
+    var st = ST[S.step], prev = S.step>0 ? S.ans[S.step-1] : null;
+    var c = (prev && st.cont) ? st.cont[prev] : "";
+    return '<p class="lead"><span class="j">'+esc(st.jump)+'</span> '+esc(c)+'</p>';
+  }
+  function reactHTML(st,p,anim){
+    return '<div class="react'+(anim?' anim':'')+'" aria-live="polite"><p class="rl">'+(st.board?'Lo que pasa cuando leen el cartel':'Lo que pasa en la parcela')+'</p><p>'+esc(st.o[p].r)+'</p></div>';
+  }
+  function choose(p){
+    S.ans[S.step] = p;
+    save();
+    Array.prototype.forEach.call(card.querySelectorAll(".option"), function(b){ b.setAttribute("aria-pressed", String(+b.getAttribute("data-p")===p)); });
+    $("react").innerHTML = reactHTML(ST[S.step], p, true);
+    $("next").disabled = false;
+  }
+  function goStep(i){
+    var dir = i>S.step ? 1 : -1;
+    S.step = i; save(); renderPlay(dir);
+    card.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  /* ---------- Resultado ---------- */
+  function counts(){ var c={1:0,2:0,3:0}; S.ans.forEach(function(a){ if(a) c[a]++; }); return c; }
+  function profileCard(p, main){
+    var d = P[p];
+    return '<article class="pcard p'+p+'"><div class="pbig" aria-hidden="true">'+p+'</div><div>'+
+      '<h3>'+esc(d.n)+'. '+esc(d.name)+'</h3>'+
+      '<p class="resp"><strong>Respuestas predominantes:</strong> '+esc(d.r)+'</p>'+
+      d.t.map(function(x){ return '<p>'+esc(x)+'</p>'; }).join('')+
+    '</div></article>';
+  }
+  function renderResult(){
+    card.hidden = true; results.hidden = false;
+    if(window.__scorm) window.__scorm.done();
+    var c = counts(), max = Math.max(c[1],c[2],c[3]);
+    var tied = [1,2,3].filter(function(p){ return c[p]===max; });
+    var tie = tied.length>1;
+    /* Siempre sale un solo perfil. Si hay empate, gana el que se eligió más recientemente entre los empatados. */
+    var main = tied[0];
+    if(tie){ for(var i=N-1;i>=0;i--){ if(tied.indexOf(S.ans[i])>-1){ main = S.ans[i]; break; } } }
+    var win = [main];
+    var other = tied.filter(function(p){ return p!==main; })[0];
+    var h = '<h2 class="sec" tabindex="-1" id="res-h">Así resolviste el reto</h2>'+
+      '<p class="res-intro">'+(tie ? "Tus decisiones se repartieron por igual entre el "+esc(P[main].n)+" y el "+esc(P[other].n)+". Te mostramos el de tu elección más reciente, pero los dos te describen. Recuerda que ninguno es mejor que otro." : esc(INTRO))+'</p>';
+    h += '<p class="res-intro bridge-lead">Esa manera de aprender no se queda en la parcela: es la misma que llevas a tu docencia. Esto es lo que dice el cuestionario sobre ella.</p>';
+    win.forEach(function(p){ h += profileCard(p, true); });
+
+    h += '<div class="chalkboard"><p class="cl">Lo que escribiste en el cartel</p><p class="ct">'+esc(boardText(S.ans[N-1]))+'</p></div>';
+
+    h += '<h3 class="h">Tu recorrido</h3><ul class="path">';
+    ST.forEach(function(st,i){
+      var p = S.ans[i];
+      h += '<li class="p'+p+'"><span class="pt">'+esc(st.time)+'</span><span class="pb"><b>'+esc(st.title)+'</b>'+esc(st.o[p].h)+'<span class="br"><em>En tu docencia</em>'+esc(st.br)+'</span></span><span class="pill" title="'+esc(P[p].n)+'">'+p+'</span></li>';
+    });
+    h += '</ul>';
+
+    h += '<h3 class="h">Cómo se reparten tus decisiones</h3><div class="cats">';
+    [1,2,3].forEach(function(p){
+      h += '<div class="cat-row p'+p+'"><div class="lbl"><span>'+esc(P[p].n)+' · '+esc(P[p].name.replace("El docente que ",""))+'</span><span>'+c[p]+' de '+N+'</span></div>'+
+           '<div class="meter" role="img" aria-label="'+c[p]+' de '+N+'"><i data-w="'+(c[p]/N*100)+'"></i></div></div>';
+    });
+    h += '</div>';
+
+    var others = [1,2,3].filter(function(p){ return win.indexOf(p)===-1; });
+    if(others.length){
+      h += '<h3 class="h">Los otros perfiles</h3><div class="rev-list">';
+      others.forEach(function(p){
+        h += '<details class="rev p'+p+'"><summary><span class="pill">'+p+'</span><span class="t">'+esc(P[p].n)+'. '+esc(P[p].name)+(tie && p===other ? ' <small>· también te describe</small>' : '')+'</span>'+ICON_CHEV+'</summary>'+
+             '<div class="rev-body"><p class="soft"><strong>Respuestas predominantes:</strong> '+esc(P[p].r)+'</p>'+
+             P[p].t.map(function(x){ return '<p>'+esc(x)+'</p>'; }).join('')+'</div></details>';
+      });
+      h += '</div>';
+    }
+
+    h += '<h3 class="h">Ahora, tu turno</h3><p class="h-lead">Cambia «cultivar» por lo que enseñas y completa la misma frase.</p>'+
+         '<div class="field"><label for="t1">Lo que enseño</label><input type="text" id="t1" maxlength="80" placeholder="Ej.: Química, Historia del arte, Estadística"></div>'+
+         '<div class="field"><label for="t2">…para que mis alumnos</label><textarea id="t2" rows="3" placeholder="Ej.: se atrevan a pensar cuando no tienen la respuesta"></textarea></div>'+
+         '<p class="pledge empty" id="pledge">Completa los dos campos para ver tu frase.</p>';
+
+    h += '<p class="closing">'+esc(CLOSING)+'</p>'+
+         '<p class="next-note">En este bloque vamos a explorar esa pregunta: ¿para qué se aprende y para qué enseñas tú?</p>'+
+         '<div class="res-actions"><button class="btn primary" type="button" id="copy">Copiar mi resultado</button>'+
+         '<button class="btn" type="button" id="again">Probar otro camino</button><span class="toast" id="toast" role="status"></span></div>'+
+         '<div class="copybox" id="copybox" hidden><label for="copyarea">Selecciona y copia el texto</label><textarea id="copyarea" readonly></textarea></div>';
+    results.innerHTML = h;
+
+    Array.prototype.forEach.call(results.querySelectorAll(".meter i"), function(i){
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ i.style.width = i.getAttribute("data-w")+"%"; }); });
+    });
+    var t1 = $("t1"), t2 = $("t2"); t1.value = S.t1; t2.value = S.t2;
+    t1.addEventListener("input", function(){ S.t1 = t1.value; save(); syncPledge(); });
+    t2.addEventListener("input", function(){ S.t2 = t2.value; save(); syncPledge(); });
+    syncPledge();
+    $("again").addEventListener("click", function(){
+      S = { phase:"intro", step:0, reached:0, ans:[null,null,null,null,null], t1:"", t2:"" }; save(); render();
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+    $("copy").addEventListener("click", function(){ doCopy(win, c, tie ? other : null); });
+    var rh = $("res-h"); if(rh) rh.focus({preventScroll:true});
+    results.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  function lowerFirst(s){ return s.charAt(0).toLowerCase()+s.slice(1); }
+  function pledgeText(){
+    var a = S.t1.trim(), b = S.t2.trim().replace(/[.\s]+$/,"");
+    return (a && b) ? "Enseño "+a+" para que mis alumnos "+lowerFirst(b)+"." : null;
+  }
+  function syncPledge(){
+    var p = $("pledge"), t = pledgeText();
+    if(t){ p.textContent = t; p.className = "pledge"; }
+    else { p.textContent = "Completa los dos campos para ver tu frase."; p.className = "pledge empty"; }
+  }
+  function doCopy(win,c,other){
+    var txt = "LA PARCELA DEL BARRIO. Mi resultado\n\n"+
+      win.map(function(p){ return P[p].n+". "+P[p].name; }).join("\n")+(other ? "\nTambién me describe: "+P[other].n+". "+P[other].name : "")+"\n\n"+
+      "Mi recorrido:\n"+ST.map(function(st,i){ return "- "+st.time+" "+st.title+": "+st.o[S.ans[i]].h; }).join("\n")+"\n\n"+
+      "En el cartel escribí: "+boardText(S.ans[N-1])+"\n\n"+
+      "Reparto: Perfil 1 ("+c[1]+"), Perfil 2 ("+c[2]+"), Perfil 3 ("+c[3]+")"+(pledgeText() ? "\n\nMi para qué: "+pledgeText() : "");
+    var toast = $("toast");
+    function fb(){ var bx=$("copybox"), ta=$("copyarea"); bx.hidden=false; ta.value=txt; ta.focus(); ta.select(); toast.textContent=""; }
+    try{ navigator.clipboard.writeText(txt).then(function(){ toast.textContent="Copiado"; }, fb); }catch(e){ fb(); }
+  }
+
+  function render(){
+    if(S.phase==="result" && allDone()) renderResult();
+    else if(S.phase==="play") renderPlay(0);
+    else renderIntro();
+  }
+  render();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
